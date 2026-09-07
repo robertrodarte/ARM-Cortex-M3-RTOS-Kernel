@@ -2,8 +2,10 @@
                                             /* Auto-generate IT instructions */
 .thumb                                      /* Thumb/Thumb2 encoding */
 
-/* Define ISR vector section here. Found on page 
-   85 of lm3s6965.pdf mcu datasheet */
+/* 
+    Define ISR vector section here. Found on page 
+    85 of document [1]
+*/
 .section .isr_vector, "a"                   /* a: section is allocatable */
 .align 2                                    /* Align 2^2 */
 .long _estack                               /* Stack pointer */
