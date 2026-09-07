@@ -3,3 +3,7 @@ reference-docs/*
 
 # Build artifacts
 build/*
+
+# Rust related
+rust-related/build/*
+rust-related/target/*
