@@ -45,6 +45,8 @@ After building the `linker.ld` and `startup.S` file, I needed to test that
 it was actually doing what it needed to do. I did this by creating
 the minimal main() function below:
 
+`main.cpp`
+
 ```cpp
 /* Used to test zeroed bss and copied data */
 int uninitGlobal;     // Define an uninitialized global variable (.bss)
