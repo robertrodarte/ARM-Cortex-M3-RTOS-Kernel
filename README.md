@@ -1,11 +1,15 @@
 # ARM-Cortex-M3-RTOS-Kernel
 
+## Prerequisites
+
+### TODO: Add toolchain setup
+
 ## Running project
 
 ### Compiling
 
 ```bash
-# Compiles startup.S into itsn own object file
+# Compiles startup.S into its own object file
 arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -g -c src/startup.S -o build/startup.o
 
 # Compiles main.cpp into its own object file
@@ -23,21 +27,19 @@ arm-none-eabi-g++ -mcpu=cortex-m3 -mthumb -ffreestanding -nostdlib -T linker.ld 
 
 ### Launch QEMU
 
-TODO: Update project to include QEMU debug toolchain
-
 Step 1: In a terminal launch QEMU, halted at reset
 
 ```bash
 ~/toolchains/qemu-src/build/qemu-system-arm -M lm3s6965evb -nographic -kernel build/kernel.elf -s -S
 ```
 
-Step 2: In a second terminal, launch GDP, connect, and drive it
+Step 2: In a second terminal, launch GDB, connect, and drive it
 
 ```bash
 arm-none-eabi-gdb build/kernel.elf
 ```
 
-## Milestone 1: Testing .bss, .data, and initial SP
+## [Milestone 1: Testing .bss, .data, and initial SP](#tags)
 
 After building the `linker.ld` and `startup.S` file, I needed to test that
 it was actually doing what it needed to do. I did this by creating
@@ -72,14 +74,14 @@ int main()
 ### Test 1: SP Initialization
 
 ```bash
-(gdb) info registers SP
-(gdb) print/x &\_estack
+(gdb) info registers sp
+(gdb) print/x &_estack
 ```
 
 ### Test 2: .data copy
 
 ```bash
-(gdb) print initGlobal # Should not print anything yet
+(gdb) print initGlobal # Should print 0, not the initGlobal value yet
 
 # Set break point to step past zero loop
 (gdb) break zero_loop
@@ -92,13 +94,17 @@ int main()
 ```bash
 # Corrupt address on purpose to see if .bss zeros it
 (gdb) set {int}0x20000000 = 0xdeadbeef
-(gdb) print unintGlobal # Should print 0xdeadbeef
+(gdb) print uninitGlobal # Should print 0xdeadbeef
 
 # Set breakpoint past the zero loop
 (gdb) break init_loop
 (gdb) continue
-(gdb) print unintGlobal # Should print 0
+(gdb) print uninitGlobal # Should print 0
 ```
+
+## Tags
+
+Milestone 1: [milestone-1-boot-memory](https://github.com/robertrodarte/ARM-Cortex-M3-RTOS-Kernel/releases/tag/milestone-1-boot-memory)
 
 ## Referenced documentation
 
@@ -106,7 +112,7 @@ int main()
 [2] Arm®v7-M Architecture Reference Manual  
 [3] https://developer.arm.com/community/arm-community-blogs/b/architectures-and-processors-blog/posts/writing-your-own-startup-code-for-cortex-m
 
-## In Progress
+## Project Details
 
 Author: Robert Rodarte  
 Date: 09/05/2026
