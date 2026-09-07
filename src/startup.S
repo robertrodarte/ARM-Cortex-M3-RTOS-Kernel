@@ -4,7 +4,7 @@
 
 /* Define ISR vector section here. Found on page 
    85 of lm3s6965.pdf mcu datasheet */
-.section    .isr_vector
+.section .isr_vector, "a"                   /* a: section is allocatable */
 .align 2                                    /* Align 2^2 */
 .long _estack                               /* Stack pointer */
 .long Reset_Handler                         /* Reset */
