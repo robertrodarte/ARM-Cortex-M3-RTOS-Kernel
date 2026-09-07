@@ -82,7 +82,6 @@ int main()
 (gdb) print initGlobal # Should not print anything yet
 
 # Set break point to step past zero loop
-
 (gdb) break zero_loop
 (gdb) continue
 (gdb) print initGlobal # Should print initGlobal value
@@ -92,12 +91,10 @@ int main()
 
 ```bash
 # Corrupt address on purpose to see if .bss zeros it
-
 (gdb) set {int}0x20000000 = 0xdeadbeef
 (gdb) print unintGlobal # Should print 0xdeadbeef
 
 # Set breakpoint past the zero loop
-
 (gdb) break init_loop
 (gdb) continue
 (gdb) print unintGlobal # Should print 0
