@@ -1,0 +1,9 @@
+{
+    "rust-analyzer.linkedProjects": ["rust-related/Cargo.toml"],
+    "rust-analyzer.cargo.allTargets": false,
+    "rust-analyzer.check.allTargets": false,
+    "[rust]": {
+        "editor.defaultFormatter": "rust-lang.rust-analyzer",
+        "editor.formatOnSave": true
+    }
+}
