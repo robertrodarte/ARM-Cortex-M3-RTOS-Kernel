@@ -104,6 +104,19 @@ int main()
 (gdb) print uninitGlobal # Should print 0
 ```
 
+### Test 4: Reach main()
+
+```bash
+# Set breakpount at main()
+(gdb) break main
+
+# Run to breakpoint with expected result
+(gdb) continue
+Continuing.
+
+Breakpoint 1, main () at src/main.cpp:8
+```
+
 ## Tags
 
 Milestone 1: [milestone-1-boot-memory](https://github.com/robertrodarte/ARM-Cortex-M3-RTOS-Kernel/releases/tag/milestone-1-boot-memory)

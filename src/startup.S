@@ -122,12 +122,16 @@ Reset_Handler:
     /* Step 3: Walk .init_array, calling each constructor */
     ldr r4, =__init_array_start__           /* Load array start address */
     ldr r5, =__init_array_end__             /* Load array end address */
+    cmp r4, r5                              /* Check if addresses are equal */
+    beq init_done                           /* Skip init_loop if equal */
 
     init_loop:                              /* Use r4-r11 as they are callee-saved registers */
         ldr r6, [r4], #4                    /* Load r4 contents into r6 and increment to next location */
         blx r6                              /* Call function */
         cmp r4, r5                          /* Check if we are at end of array */
         bne init_loop                       /* Go to top of loop if not at end, otherwise move on*/
+
+    init_done:                              /* End of init */
 
     /* Step 4: Call main() */
     bl main                                 /* Main entry point. Sets LR to loop*/
