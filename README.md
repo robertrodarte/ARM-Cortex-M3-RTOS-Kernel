@@ -118,9 +118,62 @@ Continuing.
 Breakpoint 1, main () at src/main.cpp:8
 ```
 
+## [Milestone 2: Testing TCB and Initial Stack Frame](#tags)
+
+### Test 1: Validate frame
+
+```bash
+# Open debug session
+(gdb) target remote localhost:1234
+
+# Set breakpoint right before infinite loop
+(gdb) break main.cpp:47
+
+# Continue to breakpoint
+(gdb) continue
+
+# Print the contents of tcb1
+(gdb) print tcb1
+$5 = {sp = 0x20000400 <tcb1_stack+960>, next = 0x0, stack_base = 0x20000040 <tcb1_stack>, stack_size = 256, id = 1}
+
+# Print the address of the top of the stack
+(gdb) print &tcb1_stack[240]
+$6 = (uint32_t *) 0x20000400 <tcb1_stack+960>
+
+# Print the tcb1.sp frame
+(gdb) x/16xw tcb1.sp
+0x20000400 <tcb1_stack+960>:    0x00000000      0x00000000      0x00000000      0x00000000
+0x20000410 <tcb1_stack+976>:    0x00000000      0x00000000      0x00000000      0x00000000
+0x20000420 <tcb1_stack+992>:    0x00000000      0x00000000      0x00000000      0x00000000
+0x20000430 <tcb1_stack+1008>:   0x00000000      0x00000379      0x000001ec      0x01000000
+
+# Print the entry function address
+(gdb) print tcb1_entry_fn
+$7 = {void (void)} 0x1ec <tcb1_entry_fn()>
+
+# Print the exit function address
+(gdb) print exit_fn
+$8 = {void (void)} 0x378 <exit_fn()>
+```
+
+### Visual of memory during debug
+
+| Address     | Variable   | Comments                                  |
+| ----------- | ---------- | ----------------------------------------- |
+| 0x2000_0000 | tcb1       | 0x2000_0000 is where .bss starts          |
+| 0x2000_0014 | tcb2       |                                           |
+| 0x2000_0028 | tcb3       |                                           |
+| 0x2000_003c | n/a        | Open due to alignas(8)                    |
+| 0x2000_0040 | tcb1_stack | Stack base for tcb1                       |
+| ...         |            |                                           |
+| 0x2000_0400 | n/a        | Bottom of the 16 word initial frame       |
+| 0x2000_0440 | tcb2_stack | End of tcb1_stack and start of tcb2_stack |
+| ...         |            | Repeat for tcb2 and tcb3                  |
+
 ## Tags
 
-Milestone 1: [milestone-1-boot-memory](https://github.com/robertrodarte/ARM-Cortex-M3-RTOS-Kernel/releases/tag/milestone-1-boot-memory)
+Milestone 1: [milestone-1-boot-memory](https://github.com/robertrodarte/ARM-Cortex-M3-RTOS-Kernel/releases/tag/v1.0.1)  
+Milestone 2: [milestone-2-in-progress]()
 
 ## Referenced documentation
 

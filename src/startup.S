@@ -103,21 +103,31 @@ Reset_Handler:
     ldr r2, =_sdata                         /* Load start of RAM address */
     ldr r3, =_edata                         /* Load end of RAM address */
 
+    cmp r2, r3                              /* Check if addresses are equal */
+    beq copy_done                           /* Go to end of copy if equal */
+
     copy_loop:
         ldr r4, [r1], #4                    /* Move word from FLASH to R4 and increment FLASH address to next location */
         str r4, [r2], #4                    /* Store word from R4 into RAM and increment RAM address to next location */
         cmp r2, r3                          /* Check if we are at end of data */
         bne copy_loop                       /* Go to top of loop if not at end, otherwise move on*/
 
+    copy_done:                              /* End of copy */
+
     /* Step 2: Zero .bss */
     ldr r1, =_sbss                          /* Load bss start address */
     ldr r2, =_ebss                          /* Load bss end address */
     movs r3, #0                             /* Load r3 with constant of 0 */
 
+    cmp r1, r2                              /* Check if addresses are equal */
+    beq zero_done                           /* Go to end of zero if equal */
+
     zero_loop:
         str r3, [r1], #4                    /* Zero value at current bss address and increment to next location */
         cmp r1, r2                          /* Check if we are at end of bss */
         bne zero_loop                       /* Go to top of loop if not at end, otherwise move on*/
+
+    zero_done:                              /* End of zero */
 
     /* Step 3: Walk .init_array, calling each constructor */
     ldr r4, =__init_array_start__           /* Load array start address */
