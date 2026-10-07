@@ -4,23 +4,24 @@
 
 ### TODO: Add toolchain setup
 
-## Running project
+## Compiling, linking, building, and cleaning
 
-### Compiling
+From the repo root build `build/kernel.elf` by running the following command:
 
 ```bash
-# Compiles startup.S into its own object file
-arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -g -c src/startup.S -o build/startup.o
-
-# Compiles main.cpp into its own object file
-arm-none-eabi-g++ -mcpu=cortex-m3 -mthumb -g -ffreestanding -fno-exceptions -fno-rtti -c src/main.cpp -o build/main.o
+make
 ```
 
-### Linking
+To remove all build outputs, run the following command:
 
 ```bash
-# Combines both object files into one ELF, using linker.ld as the rulebook to decide every final address
-arm-none-eabi-g++ -mcpu=cortex-m3 -mthumb -ffreestanding -nostdlib -T linker.ld build/startup.o build/main.o -o build/kernel.elf
+make clean
+```
+
+To preview the make commands, run the following command:
+
+```bash
+make -n
 ```
 
 ## Debugging
