@@ -1,9 +1,11 @@
 #include "tcb.h"
 #include "systick.h"
+#include "round_robin.h"
 
 // Defines
 static constexpr uint32_t TCB_STACK_SIZE_WORDS = 256;
 static constexpr uint32_t TICK_RATE_TICKS_PER_SECOND = 1000; // 1 ms tick rate
+static constexpr uint32_t RR_INTERVAL_MS = 10;               // 10 ms interval
 
 // Variables
 TCB tcb1, tcb2, tcb3; // Create TCBs
@@ -35,13 +37,26 @@ int main()
     {
         error_fn();
     }
-
     if (0 != tcb_init(tcb2_stack, TCB_STACK_SIZE_WORDS, 2, tcb2_entry_fn, &tcb2))
     {
         error_fn();
     }
-
     if (0 != tcb_init(tcb3_stack, TCB_STACK_SIZE_WORDS, 3, tcb3_entry_fn, &tcb3))
+    {
+        error_fn();
+    }
+
+    // Initialize and start RR scheduler
+    RoundRobinScheduler::init(RR_INTERVAL_MS);
+    if (RoundRobinScheduler::add_task(&tcb1))
+    {
+        error_fn();
+    }
+    if (RoundRobinScheduler::add_task(&tcb2))
+    {
+        error_fn();
+    }
+    if (RoundRobinScheduler::add_task(&tcb3))
     {
         error_fn();
     }

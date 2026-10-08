@@ -25,7 +25,7 @@ CXXFLAGS = $(CPUFLAGS) -g -Wall -Wextra -ffreestanding -fno-exceptions -fno-rtti
 LDFLAGS  = $(CPUFLAGS) -ffreestanding -nostdlib -T linker.ld
 
 # Set object files that get linked into the kernel
-OBJS = build/startup.o build/main.o build/tcb.o build/systick.o
+OBJS = build/startup.o build/main.o build/tcb.o build/systick.o build/round_robin.o
 
 # Set default target
 all: build/kernel.elf
