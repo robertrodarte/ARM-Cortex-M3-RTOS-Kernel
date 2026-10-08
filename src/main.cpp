@@ -1,17 +1,20 @@
 #include "tcb.h"
+#include "systick.h"
 
-// Define TCB stack size
-constexpr uint32_t TCB_STACK_SIZE_WORDS = 256;
+// Defines
+static constexpr uint32_t TCB_STACK_SIZE_WORDS = 256;
+static constexpr uint32_t TICK_RATE_TICKS_PER_SECOND = 1000; // 1 ms tick rate
 
-// Define TCBs
-TCB tcb1, tcb2, tcb3;
+// Variables
+TCB tcb1, tcb2, tcb3; // Create TCBs
 
 // Define each TCB's task stack
 alignas(8) uint32_t tcb1_stack[TCB_STACK_SIZE_WORDS];
 alignas(8) uint32_t tcb2_stack[TCB_STACK_SIZE_WORDS];
 alignas(8) uint32_t tcb3_stack[TCB_STACK_SIZE_WORDS];
 
-// Prototypes for tasks entry functions
+// Prototypes
+static void error_fn();
 static void tcb1_entry_fn();
 static void tcb2_entry_fn();
 static void tcb3_entry_fn();
@@ -21,27 +24,30 @@ static void tcb3_entry_fn();
  */
 int main()
 {
+    // Initialize the SysTick peripheral
+    if (SysTick::init(SYSTICK_CLOCK_FREQ, TICK_RATE_TICKS_PER_SECOND))
+    {
+        error_fn();
+    }
+
     // Initialize the TCBs
     if (0 != tcb_init(tcb1_stack, TCB_STACK_SIZE_WORDS, 1, tcb1_entry_fn, &tcb1))
     {
-        while (1)
-        {
-        }
+        error_fn();
     }
 
     if (0 != tcb_init(tcb2_stack, TCB_STACK_SIZE_WORDS, 2, tcb2_entry_fn, &tcb2))
     {
-        while (1)
-        {
-        }
+        error_fn();
     }
 
     if (0 != tcb_init(tcb3_stack, TCB_STACK_SIZE_WORDS, 3, tcb3_entry_fn, &tcb3))
     {
-        while (1)
-        {
-        }
+        error_fn();
     }
+
+    // Start SysTick peripheral
+    SysTick::start();
 
     // Infinite loop
     while (1)
@@ -50,6 +56,16 @@ int main()
     }
 
     return 0;
+}
+
+/**
+ * @brief Infinite loop to catch errors
+ */
+static void error_fn()
+{
+    while (1)
+    {
+    }
 }
 
 /**
