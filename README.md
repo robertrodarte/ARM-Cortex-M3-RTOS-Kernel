@@ -170,6 +170,110 @@ $8 = {void (void)} 0x378 <exit_fn()>
 | 0x2000_0440 | tcb2_stack | End of tcb1_stack and start of tcb2_stack |
 | ...         |            | Repeat for tcb2 and tcb3                  |
 
+### Test 2: SysTick Interrupt Verification
+
+```bash
+# Open the debug session
+(gdb) target remote localhost:1234
+
+# Set a breakpoint on the SysTick_Handler interrupt function
+(gdb) break SysTick_Handler
+Breakpoint 1 at 0x44a: file src/systick.cpp, line 54.
+
+# Continue to breakpoint
+(gdb) continue
+Continuing.
+Breakpoint 1, SysTick_Handler () at src/systick.cpp:54
+54          tick_counter++;
+
+# Display info in lr register
+(gdb) info registers lr
+lr             0xfffffff9          -7
+
+# Remove all breakpoints
+(gdb) delete
+Delete all breakpoints, watchpoints, tracepoints, and catchpoints? (y or n) y
+
+# Let program run so SysTick_Handler increments and stop after a few seconds
+(gdb) continue
+Continuing.
+^C
+Program received signal SIGINT, Interrupt.
+main () at src/main.cpp:53
+53          while (1)
+
+# Print the value of tick_counter
+(gdb) print tick_counter
+$1 = 5578
+```
+
+### Test 3: Round-Robin Scheduler Verification
+
+```bash
+# Open the debug session
+(gdb) target remote localhost:1234
+
+# Add a watchpoint on "current" variable to detect its value changing
+(gdb) watch 'round_robin.cpp'::current
+
+# Continue to the next value change for "current"
+(gdb) continue
+Continuing.
+Hardware watchpoint 1: 'round_robin.cpp'::current
+Old value = (TCB *) 0x0
+New value = (TCB *) 0x20000000 <tcb1>
+RoundRobinScheduler::add_task (tcb=0x20000000 <tcb1>) at src/round_robin.cpp:37
+37              tcb->next = head;
+
+# Continue to the next value change for "current"
+(gdb) continue
+Continuing.
+Hardware watchpoint 1: 'round_robin.cpp'::current
+Old value = (TCB *) 0x20000000 <tcb1>
+New value = (TCB *) 0x20000014 <tcb2>
+RoundRobinScheduler::run () at src/round_robin.cpp:69
+69          return 0;
+
+# Print the current TCB's ID
+(gdb) print current->id
+$1 = 2
+# Print the tick_counter value
+(gdb) print tick_counter
+$2 = 10
+
+# Continue to the next value change for "current"
+(gdb) continue
+Continuing.
+Hardware watchpoint 1: 'round_robin.cpp'::current
+Old value = (TCB *) 0x20000014 <tcb2>
+New value = (TCB *) 0x20000028 <tcb3>
+RoundRobinScheduler::run () at src/round_robin.cpp:69
+69          return 0;
+
+# Print the current TCB's ID
+(gdb) print current->id
+$3 = 3
+# Print the tick_counter value
+(gdb) print tick_counter
+$4 = 20
+
+# Continue to the next value change for "current"
+(gdb) continue
+Continuing.
+Hardware watchpoint 1: 'round_robin.cpp'::current
+Old value = (TCB *) 0x20000028 <tcb3>
+New value = (TCB *) 0x20000000 <tcb1>
+RoundRobinScheduler::run () at src/round_robin.cpp:69
+69          return 0;
+
+# Print the current TCB's ID
+(gdb) print current->id
+$5 = 1
+# Print the tick_counter value
+(gdb) print tick_counter
+$6 = 30
+```
+
 ## Tags
 
 Milestone 1: [milestone-1-boot-memory](https://github.com/robertrodarte/ARM-Cortex-M3-RTOS-Kernel/releases/tag/v1.0.1)  
