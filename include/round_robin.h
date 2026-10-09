@@ -17,13 +17,13 @@ public:
 
     /**
      * @brief Add a TCB to the scheduler
-     * @return uint8_t 1 if success. 0 otherwise.
+     * @return uint8_t 0 if success. 1 otherwise.
      */
     static uint8_t add_task(TCB *tcb);
 
     /**
      * @brief Run the scheduler
-     * @return uint8_t 1 - if sucess. 0 - otherwise.
+     * @return uint8_t 0 - if sucess. 1 - otherwise.
      */
     static uint8_t run();
 };
