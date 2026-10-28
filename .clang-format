@@ -1,0 +1,25 @@
+# Matches the style used in src/ and include/ before LazyVim reformatted them:
+# Allman braces, 4-space indent, long lines, `TCB *ptr` pointer style.
+BasedOnStyle: LLVM
+Language: Cpp
+
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ColumnLimit: 120
+
+BreakBeforeBraces: Allman
+AccessModifierOffset: -4
+PointerAlignment: Right
+
+# Keep one-line bodies on their own lines, e.g. get_tick_counter_val()
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortBlocksOnASingleLine: Never
+
+# Keep the aligned trailing comments in tcb_init's frame setup
+AlignTrailingComments: true
+
+# Don't reorder #includes (order is chosen by hand)
+SortIncludes: Never

@@ -7,3 +7,6 @@ build/*
 # Rust related
 rust-related/build/*
 rust-related/target/*
+compile_commands.json
+
+/.clangd
