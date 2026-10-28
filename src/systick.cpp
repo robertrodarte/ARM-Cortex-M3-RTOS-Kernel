@@ -52,7 +52,10 @@ void SysTick::start()
 extern "C" void SysTick_Handler()
 {
     // Run the scheduler
-    RoundRobinScheduler::run();
+    if (RoundRobinScheduler::check_for_switch())
+    {
+        rr_select_next();
+    }
 
     // SysTick counter reached 0, increment tick count
     tick_counter++;

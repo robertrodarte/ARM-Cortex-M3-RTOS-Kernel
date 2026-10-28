@@ -1,12 +1,12 @@
 #include "round_robin.h"
-#include "tcb.h"
 #include "systick.h"
+#include "tcb.h"
 
 static uint32_t interval_ms;
 static uint32_t last_switch_tick;
 static TCB *head;
 static TCB *tail;
-static TCB *current;
+TCB *volatile current;
 
 void RoundRobinScheduler::init(uint16_t interval)
 {
@@ -21,7 +21,7 @@ void RoundRobinScheduler::init(uint16_t interval)
 uint8_t RoundRobinScheduler::add_task(TCB *tcb)
 {
     // Error catching
-    if ((nullptr == tcb) || (tcb->sp == nullptr))
+    if ((nullptr == tcb) || (nullptr == tcb->sp))
     {
         return 1;
     }
@@ -49,22 +49,23 @@ uint8_t RoundRobinScheduler::add_task(TCB *tcb)
     return 0;
 }
 
-uint8_t RoundRobinScheduler::run()
+uint8_t RoundRobinScheduler::check_for_switch()
 {
-    // Error checking
-    if (nullptr == current)
-    {
-        return 1;
-    }
-
     // Check if tick count reached threshold
     if (interval_ms <= (SysTick::get_tick_counter_val() - last_switch_tick))
     {
         // Reset interval
         last_switch_tick = SysTick::get_tick_counter_val();
-        // Move to next TCB
-        current = current->next;
+        // Return 1 for switch
+        return 1;
     }
 
+    // Return 0 for no switch
     return 0;
+}
+
+extern "C" void rr_select_next()
+{
+    //  Move to next TCB
+    current = current->next;
 }
