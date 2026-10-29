@@ -1,11 +1,13 @@
 #include "tcb.h"
 #include "systick.h"
 #include "round_robin.h"
+#include "scb.h"
 
 // Defines
 static constexpr uint32_t TCB_STACK_SIZE_WORDS = 256;
 static constexpr uint32_t TICK_RATE_TICKS_PER_SECOND = 1000; // 1 ms tick rate
 static constexpr uint32_t RR_INTERVAL_MS = 10;               // 10 ms interval
+static constexpr uint8_t PENDSV_PRIORITY = 7;
 
 // Variables
 TCB tcb1, tcb2, tcb3; // Create TCBs
@@ -57,6 +59,12 @@ int main()
         error_fn();
     }
     if (RoundRobinScheduler::add_task(&tcb3))
+    {
+        error_fn();
+    }
+
+    // Set PendSV priority
+    if (Scb::set_pendsv_priority(PENDSV_PRIORITY))
     {
         error_fn();
     }

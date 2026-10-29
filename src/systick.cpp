@@ -1,5 +1,6 @@
 #include "systick.h"
 #include "round_robin.h"
+#include "scb.h"
 
 static volatile uint32_t tick_counter;
 
@@ -54,7 +55,7 @@ extern "C" void SysTick_Handler()
     // Run the scheduler
     if (RoundRobinScheduler::check_for_switch())
     {
-        rr_select_next();
+        Scb::pend_pendsv();
     }
 
     // SysTick counter reached 0, increment tick count
