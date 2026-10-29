@@ -69,7 +69,7 @@
 .long Default_Handler                       /* IRQ Handlers */
 
 /* Start of startup code */
-.text                       
+.text
 .align 2
 
 .thumb_func                                 /* Thumb mode function entry point */

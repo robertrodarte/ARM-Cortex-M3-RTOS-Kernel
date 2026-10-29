@@ -72,11 +72,8 @@ int main()
     // Start SysTick peripheral
     SysTick::start();
 
-    // Infinite loop
-    while (1)
-    {
-        // Logic goes here
-    }
+    // Launch the first task, switch to thread mode (PSP), and never return
+    __asm volatile("svc 0");
 
     return 0;
 }
