@@ -2,12 +2,14 @@
 #include "systick.h"
 #include "round_robin.h"
 #include "scb.h"
+#include "uart.h"
 
 // Defines
 static constexpr uint32_t TCB_STACK_SIZE_WORDS = 256;
 static constexpr uint32_t TICK_RATE_TICKS_PER_SECOND = 1000; // 1 ms tick rate
 static constexpr uint32_t RR_INTERVAL_MS = 10;               // 10 ms interval
 static constexpr uint8_t PENDSV_PRIORITY = 7;
+static constexpr uint8_t UART_BAUDE_RATE = 115200;
 
 // Variables
 TCB tcb1, tcb2, tcb3; // Create TCBs
@@ -68,6 +70,16 @@ int main()
     {
         error_fn();
     }
+
+    // Configure UART0
+    if (Uart0::init(SYSTICK_CLOCK_FREQ, UART_BAUDE_RATE))
+    {
+        error_fn();
+    }
+    // Pass message to UART0
+    Uart0::put_str("Hello from UART\r\n");
+    Uart0::put_hex(0xDEADBEEF);
+    Uart0::put_str("\r\n");
 
     // Start SysTick peripheral
     SysTick::start();
