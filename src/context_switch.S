@@ -25,7 +25,7 @@ PendSV_Handler:
   msr PSP, r1                               /* Write SP with new task's stack */
   bx lr                                     /* Branch to where we left off */
 
-.global SVC_Handler                         /* Define PendSv handler */
+.global SVC_Handler                         /* Define SVC handler */
 .thumb_func                                 /* Thumb mode function entry point */
 
 SVC_Handler:
