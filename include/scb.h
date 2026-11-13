@@ -27,6 +27,9 @@ constexpr uint16_t SYSPRI3_PENDSV_PRIORITY_BIT_SHIFT = 21;
 constexpr uint32_t SYSPRI3_PENDSV_MASK = (7u << SYSPRI3_PENDSV_PRIORITY_BIT_SHIFT);
 constexpr uint8_t MAX_PENDSV_PRIORITY = 7;
 
+// Define SYSHNDCTRL bits
+constexpr uint32_t SYSHNDCTRL_MEM_MGMT_FAULT_EN = (1u << 16);
+
 /**
  * @brief Define SCB registers
  */
@@ -87,4 +90,9 @@ public:
      * @return uint8_t 0 - Set successful, 1 - otherwise
      */
     static uint8_t set_pendsv_priority(uint8_t priority);
+
+    /**
+     * @brief Enables the memory management fault
+     */
+    static void enable_memory_management_fault();
 };

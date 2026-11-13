@@ -30,3 +30,9 @@ uint8_t Scb::set_pendsv_priority(uint8_t priority)
     // Return success
     return 0;
 }
+
+void Scb::enable_memory_management_fault()
+{
+    // Set the memory management fault bit
+    regs()->SYSHNDCTRL |= SYSHNDCTRL_MEM_MGMT_FAULT_EN;
+}

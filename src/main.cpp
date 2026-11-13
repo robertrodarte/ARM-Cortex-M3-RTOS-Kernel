@@ -3,6 +3,7 @@
 #include "round_robin.h"
 #include "scb.h"
 #include "uart.h"
+#include "mpu.h"
 
 // Defines
 static constexpr uint32_t TCB_STACK_SIZE_WORDS = 256;
@@ -11,6 +12,7 @@ static constexpr uint32_t RR_INTERVAL_MS = 10;               // 10 ms interval
 static constexpr uint8_t PENDSV_PRIORITY = 7;
 static constexpr uint32_t UART_BAUD_RATE = 115200;
 static constexpr uint32_t LOG_SIZE = 30;
+static constexpr uint32_t TCB_ALIGN_SIZE_BYTES = 1024;
 
 // Structs
 struct LogBuffer
@@ -31,9 +33,9 @@ LogBuffer log_buf[LOG_SIZE];
 volatile uint32_t log_buffer_index;
 
 // Define each TCB's task stack
-alignas(8) uint32_t tcb1_stack[TCB_STACK_SIZE_WORDS];
-alignas(8) uint32_t tcb2_stack[TCB_STACK_SIZE_WORDS];
-alignas(8) uint32_t tcb3_stack[TCB_STACK_SIZE_WORDS];
+alignas(TCB_ALIGN_SIZE_BYTES) uint32_t tcb1_stack[TCB_STACK_SIZE_WORDS];
+alignas(TCB_ALIGN_SIZE_BYTES) uint32_t tcb2_stack[TCB_STACK_SIZE_WORDS];
+alignas(TCB_ALIGN_SIZE_BYTES) uint32_t tcb3_stack[TCB_STACK_SIZE_WORDS];
 
 // Prototypes
 static void error_fn();
@@ -54,18 +56,28 @@ int main()
     }
 
     // Initialize the TCBs
-    if (0 != tcb_init(tcb1_stack, TCB_STACK_SIZE_WORDS, 1, tcb1_entry_fn, &tcb1))
+    if (tcb_init(tcb1_stack, TCB_STACK_SIZE_WORDS, 1, tcb1_entry_fn, &tcb1))
     {
         error_fn();
     }
-    if (0 != tcb_init(tcb2_stack, TCB_STACK_SIZE_WORDS, 2, tcb2_entry_fn, &tcb2))
+    if (tcb_init(tcb2_stack, TCB_STACK_SIZE_WORDS, 2, tcb2_entry_fn, &tcb2))
     {
         error_fn();
     }
-    if (0 != tcb_init(tcb3_stack, TCB_STACK_SIZE_WORDS, 3, tcb3_entry_fn, &tcb3))
+    if (tcb_init(tcb3_stack, TCB_STACK_SIZE_WORDS, 3, tcb3_entry_fn, &tcb3))
     {
         error_fn();
     }
+
+    // Initialize the MPU
+    if (Mpu::init(reinterpret_cast<uintptr_t>(tcb1_stack)))
+    {
+        error_fn();
+    }
+    // Enable memory management fault
+    Scb::enable_memory_management_fault();
+    // Enable the MPU to begin enforcing
+    Mpu::enable();
 
     // Initialize and start RR scheduler
     RoundRobinScheduler::init(RR_INTERVAL_MS);
@@ -125,9 +137,9 @@ static void error_fn()
 static void tcb1_entry_fn()
 {
     // Define local variables
-    static uint32_t now = 0;
-    static uint32_t last = 0;
-    static bool dumped = false;
+    uint32_t now = 0;
+    uint32_t last = 0;
+    bool dumped = false;
 
     // Task 1 logic goes here
     while (1)
@@ -166,8 +178,8 @@ static void tcb1_entry_fn()
 static void tcb2_entry_fn()
 {
     // Define local variables
-    static uint32_t now = 0;
-    static uint32_t last = 0;
+    uint32_t now = 0;
+    uint32_t last = 0;
 
     // Task 2 logic goes here
     while (1)
@@ -188,8 +200,8 @@ static void tcb2_entry_fn()
 static void tcb3_entry_fn()
 {
     // Define local variables
-    static uint32_t now = 0;
-    static uint32_t last = 0;
+    uint32_t now = 0;
+    uint32_t last = 0;
 
     // Task 3 logic goes here
     while (1)
