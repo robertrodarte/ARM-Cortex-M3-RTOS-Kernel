@@ -1,5 +1,6 @@
 # Referenced documentation
 reference-docs/*
+docs/*
 
 # Build artifacts
 build/*
