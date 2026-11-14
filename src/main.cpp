@@ -79,6 +79,12 @@ int main()
     // Enable the MPU to begin enforcing
     Mpu::enable();
 
+#ifdef MPU_FAULT_TEST
+    // Run a fault injection
+    volatile uint32_t *pVolatileUint = reinterpret_cast<volatile uint32_t *>(0x00001000);
+    *pVolatileUint = 0xDEADBEEF;
+#endif
+
     // Initialize and start RR scheduler
     RoundRobinScheduler::init(RR_INTERVAL_MS);
     if (RoundRobinScheduler::add_task(&tcb1))
