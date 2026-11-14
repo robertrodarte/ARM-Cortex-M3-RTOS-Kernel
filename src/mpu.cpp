@@ -59,3 +59,14 @@ void Mpu::set_base_stack(uint32_t base)
     // Set the range of the STACK_REGION to the new base address passed
     regs()->MPUBASE = base | MPU_BASE_VALID_BIT_SET | STACK_REGION;
 }
+
+/**
+ * @brief Code that runs when there is a memory fault
+ */
+extern "C" void MemManage_Handler()
+{
+    while (1)
+    {
+        // Handle fault
+    }
+}
