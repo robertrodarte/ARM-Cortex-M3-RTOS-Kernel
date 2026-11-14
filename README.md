@@ -65,7 +65,7 @@ int main()
 }
 ```
 
-### Testing GDB Commands:
+### Testing GDB Commands
 
 ---
 
@@ -274,16 +274,130 @@ $5 = 1
 $6 = 30
 ```
 
+## [Milestone 3: Need to update this...](#tags)
+
+In progress
+
+## [Milestone 4: Testing MPU](#tags)
+
+### Test 1.0: Validate new features and validate same functionality remains
+
+```bash
+# Set a breakpoint on the scheduler init
+(gdb) b RoundRobinScheduler::init
+Breakpoint 1 at 0x6ae: file src/round_robin.cpp, line 14.
+
+# Continue to breakpoint
+(gdb) c
+Continuing.
+
+# Validate register value (Address = SYSHNDCTRL)
+(gdb) x/1wx 0xE000ED24
+0xe000ed24:     0x00010000 # <-- Bit 16 set (Memory Manager Handler)
+
+# Validate register value (Address = MPUCTRL)
+(gdb) x/1wx 0xE000ED94
+0xe000ed94:     0x00000005 # <-- ENABLE and PRIVDEFENA set
+
+# Select region 0 using MPUNUMBER
+(gdb) set *(unsigned int*)0xE000ED98 = 0
+
+# Show region 0's MPUBASE and MPUATTR
+(gdb) x/2wx 0xE000ED9C
+0xe000ed9c:     0x20000401      0x13060013
+
+# Select region 1 using MPUNUMBER
+(gdb) set *(unsigned int*)0xE000ED98 = 1
+
+# Show region 1's MPUBASE and MPUATTR
+(gdb) x/2wx 0xE000ED9C
+0xe000ed9c:     0x20000401      0x13060013 # <-- QEMU ignored write
+
+# Allow the code to execute and UART to print (See below)
+(gdb) c
+Continuing.
+```
+
+#### Test 1.1: Validate UART output matches Milestone 3
+
+The output remains the same as Milestone 3, confirming that the regions did not alter the functionality of the kernel.
+
+```bash
+Hello from UART
+id: 0x00000001
+tick: 0x00000000
+id: 0x00000002
+tick: 0x0000000B
+id: 0x00000003
+tick: 0x00000015
+...
+id: 0x00000001
+tick: 0x0000010F
+id: 0x00000002
+tick: 0x00000119
+id: 0x00000003
+tick: 0x00000123
+```
+
+#### Test 1.2: Validate region and attributes configured
+
+```bash
+# Configure a breakpoint on the configure_region method
+(gdb) b Mpu::configure_region
+
+# Continue to breakpoint
+(gdb) c
+Continuing.
+
+# Run until current function returns
+(gdb) finish
+
+# Show the value of the MPUNUMBER register
+(gdb) x/1wx 0xE000ED98
+0xe000ed98:     0x00000000 # <-- Region 0 is selected
+
+# Show the value of the MPUBASE and MPUATTR register
+(gdb) x/2wx 0xE000ED9C
+0xe000ed9c:     0x00000000      0x06020023 # <-- Region 0, Attribute Configuration
+```
+
+### Test 2: Test MPU functionality with fault injection code in main.cpp
+
+```bash
+# Set a breakpoint on the Memory Management Handler
+(gdb) b MemManage_Handler
+
+# Run to breakpoint
+(gdb) c
+Continuing.
+
+# Backtrace (Show functions called that led to where programmed stopped)
+(gdb) bt
+#0  MemManage_Handler () at src/mpu.cpp:68
+#1  <signal handler called>
+#2  0x00000224 in main () at src/main.cpp:84 <-- Fault injection code in main
+
+# Show value of CFSR (Configurable Fault Status Register)
+(gdb) x/1wx 0xE000ED28
+0xe000ed28:     0x00000082
+
+# Show value of MMFAR (MemManage Fault Address Register)
+(gdb) x/1wx 0xE000ED34
+0xe000ed34:     0x00001000
+```
+
 ## Tags
 
 Milestone 1: [milestone-1-boot-memory](https://github.com/robertrodarte/ARM-Cortex-M3-RTOS-Kernel/releases/tag/v1.0.1)  
-Milestone 2: [milestone-2-in-progress]()
+Milestone 2: [milestone-2-in-progress]()  
+Milestone 3: TODO  
+Milestone 4: TODO
 
 ## Referenced documentation
 
 [1] Stellaris®LM3S6965 Microcontroller Datasheet  
 [2] Arm®v7-M Architecture Reference Manual  
-[3] https://developer.arm.com/community/arm-community-blogs/b/architectures-and-processors-blog/posts/writing-your-own-startup-code-for-cortex-m
+[3] <https://developer.arm.com/community/arm-community-blogs/b/architectures-and-processors-blog/posts/writing-your-own-startup-code-for-cortex-m>
 
 ## Project Details
 
